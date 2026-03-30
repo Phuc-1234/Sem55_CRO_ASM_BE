@@ -22,7 +22,7 @@ const productSchema = new mongoose.Schema(
             default: 0,
         },
         // Renamed to mainImage
-        // !! ORPHAN PROBLEM
+        // ORPHAN PROBLEM, but not a critical prob so do later
         mainImage: {
             url: { type: String, required: true },
             public_id: { type: String, required: true }, 
