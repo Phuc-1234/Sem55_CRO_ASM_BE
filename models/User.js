@@ -62,17 +62,18 @@ const userSchema = new mongoose.Schema(
     { timestamps: true },
 );
 
+
 // --- MIDDLEWARE: Hash password before saving ---
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
     // Only hash the password if it has been modified (or is new)
-    if (!this.isModified("password")) return next();
+    if (!this.isModified("password")) return;
 
     try {
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
-        next();
     } catch (err) {
-        next(err);
+        // In async middleware, throwing an error automatically triggers Mongoose's error handling
+        throw err; 
     }
 });
 
