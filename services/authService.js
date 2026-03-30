@@ -73,6 +73,69 @@ const registerUser = async (userData) => {
     };
 };
 
+/**
+ * Login user with email or phone + password
+ * @param {Object} credentials - Login credentials
+ * @returns {Object} - User details and tokens
+ */
+const loginUser = async (credentials) => {
+    const { identifier, password } = credentials;
+
+    // Step 2: Query the database for user where email == identifier OR phone == identifier
+    // CRUCIAL: Use .select('+password') because password has select: false in schema
+    const user = await User.findOne({
+        $or: [{ email: identifier }, { phone: identifier }],
+    }).select("+password");
+
+    // Step 3: User verification
+    if (!user) {
+        throw {
+            status: 401,
+            message: "Invalid credentials",
+        };
+    }
+
+    // Step 4: Method verification - check if user uses local authentication
+    if (user.authMethod !== "local") {
+        throw {
+            status: 400,
+            message: `Please use ${user.authMethod} login instead`,
+        };
+    }
+
+    // Step 5: Password verification using schema helper method
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+        throw {
+            status: 401,
+            message: "Invalid credentials",
+        };
+    }
+
+    // Step 6: Generate tokens
+    const accessToken = generateAccessToken(user._id, user.role);
+    const refreshToken = generateRefreshToken(user._id);
+
+    // Step 7: Save refresh token to database
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    // Step 8: Return user profile and tokens
+    return {
+        user: {
+            id: user._id,
+            fullName: user.fullName,
+            email: user.email || null,
+            phone: user.phone || null,
+            role: user.role,
+            address: user.address || null,
+        },
+        accessToken,
+        refreshToken,
+    };
+};
+
 module.exports = {
     registerUser,
+    loginUser,
 };

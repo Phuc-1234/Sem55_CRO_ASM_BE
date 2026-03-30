@@ -50,6 +50,25 @@ const validateRegister = (body) => {
     };
 };
 
+const validateLogin = (body) => {
+    const errors = [];
+
+    // Check required fields
+    if (!body.identifier) {
+        errors.push("Email or phone (identifier) is required");
+    }
+
+    if (!body.password) {
+        errors.push("Password is required");
+    }
+
+    return {
+        isValid: errors.length === 0,
+        errors,
+    };
+};
+
 module.exports = {
     validateRegister,
+    validateLogin,
 };
