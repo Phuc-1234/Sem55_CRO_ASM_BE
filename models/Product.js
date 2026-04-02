@@ -41,6 +41,10 @@ const productSchema = new mongoose.Schema(
                 required: true,
             },
         ],
+        importDate: {
+            type: Date,
+            default: Date.now,
+        }
     },
     { timestamps: true },
 );
