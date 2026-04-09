@@ -104,7 +104,43 @@ const login = async (req, res) => {
     }
 };
 
+const refreshToken = async (req, res) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+        return res.status(401).json({ success: false, message: "Refresh Token is required" });
+    }
+
+    try {
+        // 1. Verify the token signature
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+        // 2. Check if the token exists in the database for this user
+        const user = await User.findById(decoded.id);
+        if (!user || user.refreshToken !== refreshToken) {
+            return res.status(403).json({ success: false, message: "Invalid Refresh Token" });
+        }
+
+        // 3. Generate new tokens
+        const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+        const newRefreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+
+        // 4. Update the database with the new refresh token
+        user.refreshToken = newRefreshToken;
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            accessToken,
+            refreshToken: newRefreshToken
+        });
+    } catch (error) {
+        return res.status(403).json({ success: false, message: "Token expired or invalid" });
+    }
+};
+
 module.exports = {
     register,
     login,
+    refreshToken,
 };

@@ -14,4 +14,6 @@ router.post("/register", register);
 // POST /api/v1/auth/login
 router.post("/login", login);
 
+router.post('/refresh', refreshToken);
+
 module.exports = router;
