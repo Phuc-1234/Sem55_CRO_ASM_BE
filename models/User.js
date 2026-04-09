@@ -58,6 +58,13 @@ const userSchema = new mongoose.Schema(
             type: String,
             trim: true,
         },
+        // favorite products
+        favoriteProducts: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Product",
+            },
+        ]
     },
     { timestamps: true },
 );

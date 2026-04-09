@@ -7,6 +7,9 @@ require("dotenv").config();
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
+const shopRoutesV2 = require("./routes/v2/shopRoutes");
+const orderRoutesV2 = require("./routes/v2/orderRoutes");
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -36,6 +39,12 @@ app.use("/api/v1/products", productRoutes);
 
 // Category Routes
 app.use("/api/v1/categories", categoryRoutes);
+
+// Shop Routes V2
+app.use("/api/v1", shopRoutesV2);
+
+// Order Routes V2
+app.use("/api/v1", orderRoutesV2);
 
 // Start Server
 app.listen(PORT, () => {
