@@ -4,8 +4,8 @@
  */
 
 const express = require("express");
-const { register, login } = require("../controllers/authController");
-const { refreshToken } = require("../controllers/refreshController");
+const { register, login, refreshToken } = require("../controllers/authController");
+
 
 const router = express.Router();
 
