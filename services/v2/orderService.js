@@ -2,7 +2,21 @@ const OrderV2 = require("../../models/v2/OrderV2");
 const ProductV2 = require("../../models/v2/ProductV2");
 
 const fetchUserCart = async (userId) => {
-    return await OrderV2.findOne({ user: userId, status: "cart" }).populate(
+    let cart = await OrderV2.findOne({ user: userId, status: "cart" });
+
+    if (!cart) {
+        cart = new OrderV2({
+            user: userId,
+            status: "cart",
+            items: [],
+            payment: { method: "pending", info: {} },
+            shipping: { method: "pending" },
+            recipientInfo: { fullName: "Pending", address: "Pending" },
+        });
+        await cart.save();
+    }
+
+    return await OrderV2.findById(cart._id).populate(
         "items.productId",
         "name imgURL price",
     );
