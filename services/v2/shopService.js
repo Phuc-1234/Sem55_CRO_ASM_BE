@@ -1,5 +1,5 @@
-const Category = require("../../models/CategoryV2");
-const Product = require("../../models/ProductV2");
+const Category = require("../../models/v2/CategoryV2");
+const Product = require("../../models/v2/ProductV2");
 
 const fetchAllCategories = async () => {
     return await Category.find().select("name _id imgURL").lean();

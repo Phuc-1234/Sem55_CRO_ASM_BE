@@ -2,14 +2,11 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const axios = require("axios");
 
-
-const app = express();
-const PORT = 3000;
-
+const router = express.Router();
  
-app.use(bodyParser.json());
+router.use(bodyParser.json());
 
-app.post("/send-noti", async (req, res) => {
+router.post("/send-noti", async (req, res) => { 
     const { token, title, body } = req.body;
 
     try {
@@ -36,6 +33,7 @@ app.post("/send-noti", async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+
+
+
+module.exports = router;

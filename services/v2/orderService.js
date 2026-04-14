@@ -1,5 +1,5 @@
-const OrderV2 = require("../../models/OrderV2");
-const ProductV2 = require("../../models/ProductV2");
+const OrderV2 = require("../../models/v2/OrderV2");
+const ProductV2 = require("../../models/v2/ProductV2");
 
 const fetchUserCart = async (userId) => {
     return await OrderV2.findOne({ user: userId, status: "cart" }).populate(
@@ -78,14 +78,14 @@ const processCartUpdate = async (userId, itemData) => {
 // Helper to calculate money totals
 const calculateTotals = (cart) => {
     const subtotal = cart.items.reduce((acc, item) => {
-        return acc + (item.priceAtTime * item.quantity);
+        return acc + item.priceAtTime * item.quantity;
     }, 0);
     const total = subtotal + (cart.shipping?.fee || 0);
     return { subtotal, total };
 };
 
 const editCheckoutDetails = async (userId, updateData) => {
-    const cart = await OrderV2.findOne({ user: userId, status: 'cart' });
+    const cart = await OrderV2.findOne({ user: userId, status: "cart" });
     if (!cart) throw { status: 404, message: "No active cart found" };
 
     // Update fields from body (payment, shipping, recipientInfo)
@@ -103,27 +103,38 @@ const editCheckoutDetails = async (userId, updateData) => {
 };
 
 const completePurchase = async (userId) => {
-    const cart = await OrderV2.findOne({ user: userId, status: 'cart' });
-    
+    const cart = await OrderV2.findOne({ user: userId, status: "cart" });
+
     if (!cart || cart.items.length === 0) {
         throw { status: 400, message: "Cart is empty" };
     }
 
     // Basic Validation: Ensure checkout info isn't still 'Pending'
-    if (cart.recipientInfo.address === 'Pending' || cart.payment.method === 'pending') {
-        throw { status: 400, message: "Please complete shipping and payment info" };
+    if (
+        cart.recipientInfo.address === "Pending" ||
+        cart.payment.method === "pending"
+    ) {
+        throw {
+            status: 400,
+            message: "Please complete shipping and payment info",
+        };
     }
 
     // Final calculations before locking
     const { subtotal, total } = calculateTotals(cart);
     cart.subtotal = subtotal;
     cart.total = total;
-    
+
     // The "Finalize" step
-    cart.status = 'ordered';
+    cart.status = "ordered";
 
     await cart.save();
     return cart;
 };
 
-module.exports = { fetchUserCart, processCartUpdate, editCheckoutDetails, completePurchase };
+module.exports = {
+    fetchUserCart,
+    processCartUpdate,
+    editCheckoutDetails,
+    completePurchase,
+};

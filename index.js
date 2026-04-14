@@ -9,6 +9,8 @@ const productRoutes = require("./routes/productRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const shopRoutesV2 = require("./routes/v2/shopRoutes");
 const orderRoutesV2 = require("./routes/v2/orderRoutes");
+const testNotifications = require("./routes/testNotifications");
+const orderRoutes = require("./routes/orderRoutes");
 
 
 const app = express();
@@ -43,8 +45,16 @@ app.use("/api/v1/categories", categoryRoutes);
 // Shop Routes V2
 app.use("/api/v1", shopRoutesV2);
 
-// Order Routes V2
-app.use("/api/v1", orderRoutesV2);
+// Order Routes
+app.use("/api/v1/ordersV2", orderRoutesV2);
+app.use("/api/v1/orders", orderRoutes);
+
+
+// Test Notifications Route
+app.use("/api/v1", testNotifications);
+ 
+
+
 
 // Start Server
 app.listen(PORT, () => {

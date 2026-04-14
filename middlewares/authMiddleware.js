@@ -17,7 +17,7 @@ const protect = async (req, res, next) => {
         }
 
         // 2. Verify token
-        // Make sure you have JWT_ACCESS_SECRET in your .env file
+        // Make sure you have JWT_SECRET in your .env file
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         // 3. Attach user data to the request object
@@ -29,7 +29,12 @@ const protect = async (req, res, next) => {
 
         console.log(`Authenticated user ID: ${req.user.id}, Role: ${req.user.role}`);
 
+        // print if next is a function (it should be)
+        console.log("Is next a function?", typeof next === "function");
+
         next();
+
+
     } catch (error) {
         console.error("Auth Middleware Error:", error.message);
         return res.status(401).json({
