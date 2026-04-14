@@ -43,7 +43,7 @@ const processCartUpdate = async (userId, itemData) => {
             items: [],
             payment: { method: "pending", info: {} },
             shipping: { method: "pending" },
-            recipientInfo: { fullName: user.fullName, address: user.address },
+            recipientInfo: { fullName: user.fullName || "Pending", address: user.address || "Pending" },
         });
     }
 
