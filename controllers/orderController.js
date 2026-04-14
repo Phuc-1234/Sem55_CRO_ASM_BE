@@ -64,6 +64,7 @@ const finalizeOrder = async (req, res) => {
             newStatus: "ordered",
         });
     } catch (error) {
+        console.error("Error finalizing order:", error);
         res.status(400).json({ success: false, message: error.message });
     }
 };

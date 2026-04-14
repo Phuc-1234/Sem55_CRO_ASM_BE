@@ -1,17 +1,21 @@
 const OrderV2 = require("../../models/v2/OrderV2");
 const ProductV2 = require("../../models/v2/ProductV2");
+const User = require("../../models/User");
 
 const fetchUserCart = async (userId) => {
     let cart = await OrderV2.findOne({ user: userId, status: "cart" });
 
     if (!cart) {
+        const user = await User.findById(userId);
+        if (!user) throw { status: 404, message: "User not found" };
+
         cart = new OrderV2({
             user: userId,
             status: "cart",
             items: [],
             payment: { method: "pending", info: {} },
             shipping: { method: "pending" },
-            recipientInfo: { fullName: "Pending", address: "Pending" },
+            recipientInfo: { fullName: user.fullName, address: user.address },
         });
         await cart.save();
     }
@@ -30,13 +34,16 @@ const processCartUpdate = async (userId, itemData) => {
     let cart = await OrderV2.findOne({ user: userId, status: "cart" });
 
     if (!cart) {
+        const user = await User.findById(userId);
+        if (!user) throw { status: 404, message: "User not found" };
+
         cart = new OrderV2({
             user: userId,
             status: "cart",
             items: [],
             payment: { method: "pending", info: {} },
             shipping: { method: "pending" },
-            recipientInfo: { fullName: "Pending", address: "Pending" },
+            recipientInfo: { fullName: user.fullName, address: user.address },
         });
     }
 
